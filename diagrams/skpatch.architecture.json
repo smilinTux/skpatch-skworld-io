@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "skpatch Component Map",
+    "subtitle": "Patch at AI speed: pinned images, continuous scanning, gated release",
+    "output": "skpatch.architecture.html",
+    "quality_profile": "showcase"
+  },
+  "components": [
+    { "id": "registries", "type": "external", "label": "Upstream Registries", "sublabel": "image sources", "pos": [40, 340], "size": [150, 64] },
+    { "id": "gate", "type": "backend", "label": "Release Gate", "sublabel": "build + test harness", "pos": [700, 40], "size": [160, 64] },
+    { "id": "buildhost", "type": "cloud", "label": "Build Host", "sublabel": "+ failover", "pos": [960, 40], "size": [160, 64] },
+    { "id": "repo", "type": "backend", "label": "skgit", "sublabel": "repo of record", "pos": [280, 180], "size": [150, 64] },
+    { "id": "renovate", "type": "backend", "label": "Renovate", "sublabel": "pin-bump PRs", "pos": [280, 340], "size": [150, 64], "tag": "weekly" },
+    { "id": "skflow", "type": "backend", "label": "skflow", "sublabel": "workflow engine", "pos": [520, 340], "size": [150, 64] },
+    { "id": "inventory", "type": "backend", "label": "Inventory Job", "sublabel": "daily, read-only", "pos": [520, 500], "size": [150, 64] },
+    { "id": "skbom", "type": "database", "label": "skbom", "sublabel": "Dependency-Track + SBOM store", "pos": [760, 340], "size": [160, 64], "tag": "CVE matching" },
+    { "id": "alerts", "type": "messagebus", "label": "Alert Fan-out", "sublabel": "chat + GTD + ITIL", "pos": [760, 500], "size": [160, 64] },
+    { "id": "dashboard", "type": "frontend", "label": "Update Dashboard", "sublabel": "host patching", "pos": [1000, 500], "size": [170, 64] },
+    { "id": "sso", "type": "security", "label": "sksso", "sublabel": "identity provider", "pos": [1000, 640], "size": [150, 64] },
+    { "id": "deploy", "type": "cloud", "label": "Deploy Targets", "sublabel": "fleet nodes, pinned", "pos": [1280, 340], "size": [160, 64] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Fleet cluster (always-on)", "wraps": ["repo", "renovate", "skflow", "inventory", "skbom", "alerts", "dashboard", "deploy"] },
+    { "kind": "security-group", "label": "SSO-gated", "wraps": ["dashboard", "sso"] },
+    { "kind": "security-group", "label": "Build worker, outbound HTTPS only", "wraps": ["gate", "buildhost"] }
+  ],
+  "connections": [
+    { "id": "pull-images", "from": "registries", "to": "inventory", "label": "image pulls", "variant": "default" },
+    { "id": "renovate-scans", "from": "repo", "to": "renovate", "label": "detects pins", "variant": "dashed" },
+    { "id": "renovate-prs", "from": "renovate", "to": "repo", "label": "opens PRs", "variant": "emphasis" },
+    { "id": "flow-dispatch", "from": "skflow", "to": "inventory", "label": "schedules", "variant": "dashed" },
+    { "id": "inventory-digests", "from": "inventory", "to": "skbom", "label": "digests + SBOMs", "variant": "emphasis" },
+    { "id": "match-cves", "from": "skbom", "to": "alerts", "label": "policy match", "variant": "emphasis" },
+    { "id": "pr-to-gate", "from": "repo", "to": "gate", "label": "PR dispatch", "variant": "default" },
+    { "id": "gate-to-build", "from": "gate", "to": "buildhost", "label": "runs on", "variant": "default" },
+    { "id": "gate-pass", "from": "gate", "to": "deploy", "label": "tagged + gated", "variant": "emphasis" },
+    { "id": "dashboard-reads", "from": "dashboard", "to": "deploy", "label": "host updates", "variant": "default" },
+    { "id": "sso-gate", "from": "sso", "to": "dashboard", "label": "auth", "variant": "security" },
+    { "id": "alerts-notify", "from": "alerts", "to": "dashboard", "label": "surfaces findings", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Pinned end to end", "items": ["Every image pinned by digest, never a bare tag", "Inventory runs daily, read-only against the fleet"] },
+    { "dot": "emerald", "title": "Continuous matching", "items": ["skbom re-matches stored SBOMs against CVE feeds on its own schedule", "Renovate opens the pin-bump PRs; a release gate proves them before anything ships"] },
+    { "dot": "rose", "title": "Gated access", "items": ["The update dashboard and its host-patching surface sit behind SSO", "The build worker only needs outbound HTTPS to the repo of record"] }
+  ]
+}

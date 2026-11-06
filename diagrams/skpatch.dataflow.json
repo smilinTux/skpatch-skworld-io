@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "skpatch Data Flow",
+    "subtitle": "inventory to SBOM to Dependency-Track to alerts/PRs to gate to deploy",
+    "output": "skpatch.dataflow.html",
+    "viewBox": [1080, 600],
+    "animation": "trace",
+    "quality_profile": "showcase"
+  },
+  "stages": [
+    { "label": "Inventory" },
+    { "label": "SBOM" },
+    { "label": "Match" },
+    { "label": "Respond" },
+    { "label": "Gate + Deploy" }
+  ],
+  "nodes": [
+    { "id": "services", "type": "backend", "label": "Running Services", "sublabel": "fleet containers", "stage": 0, "row": 1, "tag": "source" },
+    { "id": "inventory", "type": "backend", "label": "Inventory Job", "sublabel": "image, digest, exposure", "stage": 1, "row": 0, "tag": "internal" },
+    { "id": "sbom", "type": "backend", "label": "SBOM Job", "sublabel": "Trivy, new digests only", "stage": 1, "row": 2, "tag": "internal" },
+    { "id": "deptrack", "type": "database", "label": "skbom", "sublabel": "Dependency-Track", "stage": 2, "row": 1, "tag": "SBOM store" },
+    { "id": "feeds", "type": "external", "label": "CVE Feeds", "sublabel": "NVD, GHSA, OSV", "stage": 2, "row": 0, "width": 150, "tag": "public" },
+    { "id": "policy", "type": "security", "label": "Policy Engine", "sublabel": "exposure x severity", "stage": 3, "row": 1, "width": 150, "tag": "internal" },
+    { "id": "alerts", "type": "messagebus", "label": "Alert Fan-out", "sublabel": "chat, GTD, ITIL", "stage": 3, "row": 0, "tag": "internal" },
+    { "id": "renovate", "type": "backend", "label": "Renovate PRs", "sublabel": "weekly, grouped", "stage": 3, "row": 2, "tag": "internal" },
+    { "id": "gate", "type": "backend", "label": "Release Gate", "sublabel": "build + test harness", "stage": 4, "row": 1, "width": 150, "tag": "proves fix" },
+    { "id": "deploy", "type": "cloud", "label": "Deploy", "sublabel": "pinned update", "stage": 4, "row": 2, "tag": "same-day / weekly" }
+  ],
+  "flows": [
+    { "id": "service-inventory", "from": "services", "to": "inventory", "label": "docker inspect", "classification": "internal, read-only", "variant": "default" },
+    { "id": "service-sbom", "from": "services", "to": "sbom", "label": "image pull", "classification": "internal", "variant": "default" },
+    { "id": "inventory-deptrack", "from": "inventory", "to": "deptrack", "label": "inventory rows", "classification": "internal", "variant": "emphasis" },
+    { "id": "sbom-deptrack", "from": "sbom", "to": "deptrack", "label": "CycloneDX SBOM", "classification": "internal", "variant": "emphasis" },
+    { "id": "feeds-deptrack", "from": "feeds", "to": "deptrack", "label": "vuln data", "classification": "public", "variant": "default" },
+    { "id": "deptrack-policy", "from": "deptrack", "to": "policy", "label": "matched findings", "classification": "internal", "variant": "emphasis" },
+    { "id": "policy-alerts", "from": "policy", "to": "alerts", "label": "critical + exposed", "classification": "sensitive: same-day", "variant": "security", "labelDy": -124 },
+    { "id": "policy-renovate", "from": "policy", "to": "renovate", "label": "high, fix available", "classification": "internal: weekly", "variant": "dashed" },
+    { "id": "alerts-gate", "from": "alerts", "to": "gate", "label": "same-day PR", "classification": "sensitive: expedited", "variant": "security", "labelDy": 23 },
+    { "id": "renovate-gate", "from": "renovate", "to": "gate", "label": "weekly PR", "classification": "internal", "variant": "dashed" },
+    { "id": "gate-deploy", "from": "gate", "to": "deploy", "label": "tagged commit", "classification": "internal", "variant": "emphasis" }
+  ],
+  "cards": [
+    { "dot": "emerald", "title": "Primary path", "items": ["Inventory and SBOM both run against the live fleet, read-only", "skbom re-matches continuously, not just on ingest"] },
+    { "dot": "rose", "title": "Sensitivity labels", "items": ["Critical findings on a public or SSO-gated service take the sensitive same-day path", "Everything else batches weekly through Renovate, still gated"] },
+    { "dot": "cyan", "title": "Nothing ships unproven", "items": ["Every path converges on the same release gate before deploy", "Deploy is always a pinned digest update, never a floating tag"] }
+  ]
+}

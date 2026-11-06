@@ -1,0 +1,62 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "skpatch Release Lanes",
+    "subtitle": "same-day critical lane and weekly batch lane",
+    "animation": "trace",
+    "visual_preset": "signal-flow",
+    "quality_profile": "showcase",
+    "output": "skpatch.workflow.html"
+  },
+  "lanes": [
+    { "id": "trigger", "label": "Trigger" },
+    { "id": "triage", "label": "Triage" },
+    { "id": "gate", "label": "Release Gate" },
+    { "id": "deploy_sameday", "label": "Deploy (same-day)" },
+    { "id": "deploy_weekly", "label": "Deploy (weekly)" },
+    { "id": "notify", "label": "Notify" }
+  ],
+  "phases": [
+    { "id": "detect", "label": "Detect", "fromCol": 0, "toCol": 1 },
+    { "id": "respond", "label": "Respond", "fromCol": 2, "toCol": 3, "variant": "emphasis" },
+    { "id": "ship", "label": "Prove + ship", "fromCol": 4, "toCol": 5, "variant": "dashed" }
+  ],
+  "groups": [
+    { "id": "same_day_lane", "label": "Same-day critical lane", "lane": "deploy_sameday", "fromCol": 4, "toCol": 4, "variant": "security" },
+    { "id": "weekly_lane", "label": "Weekly batch lane", "lane": "deploy_weekly", "fromCol": 4, "toCol": 4, "variant": "dashed" }
+  ],
+  "mainPath": ["critical_find", "sec_pr", "gate_run", "tag_commit", "same_day_deploy"],
+  "nodes": [
+    { "id": "critical_find", "lane": "trigger", "col": 0, "type": "security", "label": "Critical finding", "sublabel": "fix available, public/SSO", "tag": "same day", "width": 150 },
+    { "id": "weekly_find", "lane": "trigger", "col": 1, "type": "backend", "label": "High / rebuild", "sublabel": "fix available", "tag": "weekly", "width": 150 },
+    { "id": "sec_pr", "lane": "triage", "col": 1, "type": "backend", "label": "Immediate security PR", "sublabel": "osvVulnerabilityAlerts", "width": 150 },
+    { "id": "batch_pr", "lane": "triage", "col": 2, "type": "backend", "label": "Grouped Monday PRs", "sublabel": "Renovate schedule", "width": 150 },
+    { "id": "monthly_review", "lane": "triage", "col": 3, "type": "frontend", "label": "Monthly review", "sublabel": "long tail, skbom dashboard", "width": 150 },
+    { "id": "gate_run", "lane": "gate", "col": 2, "type": "backend", "label": "Release gate", "sublabel": "build + test harness", "tag": "proves the fix", "width": 150 },
+    { "id": "gate_fail", "lane": "gate", "col": 3, "type": "security", "label": "Gate fails", "sublabel": "fix and retry", "width": 150 },
+    { "id": "tag_commit", "lane": "gate", "col": 4, "type": "backend", "label": "Tag tested commit", "sublabel": "verified on remote", "width": 150 },
+    { "id": "same_day_deploy", "lane": "deploy_sameday", "col": 4, "type": "cloud", "label": "Same-day deploy", "sublabel": "critical, fix reachable", "tag": "same day", "width": 150 },
+    { "id": "weekly_deploy", "lane": "deploy_weekly", "col": 4, "type": "cloud", "label": "Weekly deploy", "sublabel": "batched rollout", "tag": "weekly", "width": 150 },
+    { "id": "notify_node", "lane": "notify", "col": 5, "type": "messagebus", "label": "Notify + record", "sublabel": "chat, GTD, ITIL change", "width": 150 }
+  ],
+  "edges": [
+    { "id": "critical-to-pr", "from": "critical_find", "to": "sec_pr", "variant": "security", "label": "same day" },
+    { "id": "weekly-to-pr", "from": "weekly_find", "to": "batch_pr", "variant": "dashed", "label": "weekly" },
+    { "id": "batch-to-review", "from": "batch_pr", "to": "monthly_review", "variant": "dashed", "label": "unactioned" },
+    { "id": "pr-to-gate", "from": "sec_pr", "to": "gate_run", "variant": "emphasis" },
+    { "id": "batch-to-gate", "from": "batch_pr", "to": "gate_run", "variant": "dashed" },
+    { "id": "gate-denied", "from": "gate_run", "to": "gate_fail", "label": "red", "variant": "security", "role": "error" },
+    { "id": "retry", "from": "gate_fail", "to": "gate_run", "label": "revise", "variant": "dashed", "role": "branch" },
+    { "id": "gate-green", "from": "gate_run", "to": "tag_commit", "label": "green", "variant": "emphasis" },
+    { "id": "tag-to-same-day", "from": "tag_commit", "to": "same_day_deploy", "variant": "security", "label": "critical path" },
+    { "id": "tag-to-weekly", "from": "tag_commit", "to": "weekly_deploy", "variant": "dashed", "label": "batch" },
+    { "id": "same-day-notify", "from": "same_day_deploy", "to": "notify_node", "variant": "emphasis" },
+    { "id": "weekly-notify", "from": "weekly_deploy", "to": "notify_node", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "rose", "title": "Same-day critical lane", "items": ["Critical, fix available, service public or SSO-gated: security PR, gate, deploy, same day", "An image-only tactical update is allowed with the gate trailing"] },
+    { "dot": "cyan", "title": "Weekly batch lane", "items": ["High-severity fixes and digest bumps group into Monday PRs", "Everything else lands in the monthly review from the dashboard"] },
+    { "dot": "emerald", "title": "One gate, two speeds", "items": ["Both lanes converge on the same release gate before anything deploys", "Nothing bypasses it except the documented same-day critical path"] }
+  ]
+}

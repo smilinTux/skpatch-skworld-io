@@ -1,0 +1,31 @@
+# skpatch
+
+> Patch at AI speed.
+
+skpatch is SKWorld's patching program for a sovereign fleet: hosts and container images both,
+kept current on a known, kept cadence instead of by memory. Every image it tracks is pinned to a
+SHA-256 digest, never a bare tag. A daily, read-only job inventories every running service (image,
+tag, digest, exposure class) and a daily SBOM job uploads a CycloneDX bill of materials for every
+distinct image digest into skbom, a Dependency-Track instance that re-matches those SBOMs against
+NVD, GHSA, and OSV continuously, not just on ingest. Renovate opens the pin-bump pull requests on
+its own weekly schedule, plus an immediate security pull request the moment a pin matches a known
+vulnerability. Every change, whatever triggered it, runs the same release gate (a build and test
+harness) before it is tagged and deployed. The lane a finding takes depends on severity, fix
+availability, and exposure: same-day deploy for a critical with a fix on a public or SSO-gated
+service, a weekly batch for the rest, and a monthly review from the skbom dashboard for the long
+tail. The underlying host packages patch through the same discipline, one layer down, via an
+SSO-gated update dashboard.
+
+## Links
+
+- [Live site](https://skpatch.skworld.io)
+- [Documentation](https://skpatch.skworld.io/docs.html)
+- [Source code](https://github.com/smilinTux/skpatch)
+
+## About smilinTux
+
+skpatch is part of the **smilinTux sovereign AI ecosystem**, a suite of open-source tools built by
+its creators to give humans and AI agents genuine, authentic infrastructure they can own and
+trust. No corporate clouds, no black-box SaaS middlemen. MIT License.
+
+Other ecosystem projects: [SKWorld](https://skworld.io), [SKStacks](https://skstacks.skworld.io), [sksec](https://sksec.skworld.io), [skhub](https://skhub.skworld.io), [skgateway](https://skgateway.skworld.io), [Lumina](https://lumina.skworld.io)

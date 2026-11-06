@@ -1,0 +1,8 @@
+{
+  "repo": "smilinTux/skpatch",
+  "branch": "main",
+  "path": "docs",
+  "generated": "2026-11-06",
+  "note": "Committed fallback for the /docs viewer when the GitHub Contents API is unavailable or rate-limited. The source repo may still be empty at this manifest's creation time; the self-healing workflow (.github/workflows/refresh-docs-manifest.yml) regenerates it daily once docs land. Regenerate manually with: python .github/scripts/docs-manifest-gen.py smilinTux/skpatch --out docs-manifest.json",
+  "docs": []
+}

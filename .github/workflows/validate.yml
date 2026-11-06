@@ -1,0 +1,193 @@
+name: validate-site
+
+# Validation-only workflow. This does NOT deploy.
+# GitHub Pages for this repo is served via the classic branch-based
+# deploy, which is independent of any Actions workflow here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Confirm CNAME and .nojekyll present
+        run: |
+          fail=0
+          if [ -f CNAME ]; then
+            echo "OK: CNAME present -> $(cat CNAME)"
+          else
+            echo "FAIL: CNAME missing"; fail=1
+          fi
+          if [ -f .nojekyll ]; then
+            echo "OK: .nojekyll present"
+          else
+            echo "FAIL: .nojekyll missing"; fail=1
+          fi
+          exit $fail
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: HTML well-formedness check (stdlib html.parser)
+        run: |
+          python3 - <<'PY'
+          import glob, sys
+          from html.parser import HTMLParser
+
+          # Void elements that never need a closing tag.
+          VOID = {
+              "area","base","br","col","embed","hr","img","input","link",
+              "meta","param","source","track","wbr",
+          }
+          # Elements where browsers tolerate omitted end tags; we don't
+          # require strict nesting closure for these.
+          OPTIONAL_CLOSE = {"p","li","td","th","tr","thead","tbody","tfoot",
+                            "option","dt","dd","html","head","body","colgroup"}
+
+          class WF(HTMLParser):
+              def __init__(self, path):
+                  super().__init__(convert_charrefs=True)
+                  self.path = path
+                  self.stack = []
+                  self.errors = []
+
+              def handle_starttag(self, tag, attrs):
+                  if tag not in VOID:
+                      self.stack.append((tag, self.getpos()))
+
+              def handle_startendtag(self, tag, attrs):
+                  pass  # self-closed, nothing to track
+
+              def handle_endtag(self, tag):
+                  if tag in VOID:
+                      return
+                  # Pop until we find a matching open tag, tolerating
+                  # optional-close elements left on the stack.
+                  while self.stack:
+                      open_tag, pos = self.stack.pop()
+                      if open_tag == tag:
+                          return
+                      if open_tag in OPTIONAL_CLOSE:
+                          continue
+                      self.errors.append(
+                          f"{self.path}:{pos[0]}: <{open_tag}> closed by </{tag}>"
+                      )
+                      return
+                  self.errors.append(
+                      f"{self.path}: stray </{tag}> with no matching open tag"
+                  )
+
+              def finish(self):
+                  for tag, pos in self.stack:
+                      if tag not in OPTIONAL_CLOSE:
+                          self.errors.append(
+                              f"{self.path}:{pos[0]}: <{tag}> never closed"
+                          )
+                  return self.errors
+
+          total = []
+          files = sorted(glob.glob("**/*.html", recursive=True))
+          if not files:
+              print("No HTML files found"); sys.exit(1)
+          for f in files:
+              p = WF(f)
+              try:
+                  with open(f, encoding="utf-8") as fh:
+                      p.feed(fh.read())
+              except Exception as e:
+                  total.append(f"{f}: parse error: {e}")
+                  continue
+              errs = p.finish()
+              if errs:
+                  total.extend(errs)
+              else:
+                  print(f"OK: {f} well-formed")
+          if total:
+              print("\nHTML well-formedness errors:")
+              for e in total:
+                  print("  " + e)
+              sys.exit(1)
+          PY
+
+      - name: Internal link check
+        run: |
+          python3 - <<'PY'
+          import glob, os, sys
+          from html.parser import HTMLParser
+
+          class Collector(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True)
+                  self.ids = set()
+                  self.refs = []  # (attr_value, line)
+
+              def handle_starttag(self, tag, attrs):
+                  d = dict(attrs)
+                  if "id" in d and d["id"]:
+                      self.ids.add(d["id"])
+                  if "name" in d and tag == "a" and d.get("name"):
+                      self.ids.add(d["name"])
+                  for key in ("href", "src"):
+                      v = d.get(key)
+                      if v:
+                          self.refs.append((v, self.getpos()[0]))
+
+          def is_external(v):
+              return (
+                  v.startswith("http://") or v.startswith("https://")
+                  or v.startswith("//") or v.startswith("mailto:")
+                  or v.startswith("tel:") or v.startswith("data:")
+                  or v.startswith("javascript:")
+              )
+
+          errors = []
+          files = sorted(glob.glob("**/*.html", recursive=True))
+          for f in files:
+              c = Collector()
+              with open(f, encoding="utf-8") as fh:
+                  c.feed(fh.read())
+              base = os.path.dirname(f)
+              for ref, line in c.refs:
+                  if is_external(ref):
+                      continue
+                  # Pure in-page anchor.
+                  if ref.startswith("#"):
+                      anchor = ref[1:]
+                      if anchor and anchor not in c.ids:
+                          errors.append(f"{f}:{line}: missing anchor #{anchor}")
+                      continue
+                  # Strip query/fragment from local paths.
+                  path = ref.split("#", 1)[0].split("?", 1)[0]
+                  if not path:
+                      continue
+                  # A leading "/" is root-relative on the published site,
+                  # which is the repo root here, not the filesystem root.
+                  if path.startswith("/"):
+                      target = os.path.normpath(path.lstrip("/"))
+                  else:
+                      target = os.path.normpath(os.path.join(base, path))
+                  if path.endswith("/"):
+                      target = os.path.join(target, "index.html")
+                  if not os.path.exists(target):
+                      errors.append(f"{f}:{line}: broken link -> {ref}")
+
+          if errors:
+              print("Internal link errors:")
+              for e in errors:
+                  print("  " + e)
+              sys.exit(1)
+          print("OK: all internal links resolve")
+          PY

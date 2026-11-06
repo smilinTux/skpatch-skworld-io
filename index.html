@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>skpatch · Patch at AI Speed 🩹</title>
+  <meta name="description" content="skpatch pins every image by digest, inventories the fleet daily, SBOMs it into Dependency-Track, matches CVEs continuously, and ships fixes through a release gate: same day for critical, weekly for the rest, monthly review for the long tail.">
+  <link rel="canonical" href="https://skpatch.skworld.io/">
+  <meta name="theme-color" content="#0d0a05">
+
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="skpatch · SKWorld">
+  <meta property="og:title" content="skpatch · Patch at AI Speed">
+  <meta property="og:description" content="Pinned images, continuous CVE matching, Renovate PRs, and a release gate that proves them: same day for critical, weekly for the rest. Part of the SKWorld sovereign AI ecosystem.">
+  <meta property="og:url" content="https://skpatch.skworld.io/">
+  <meta property="og:image" content="https://skpatch.skworld.io/og.png">
+  <meta property="og:image:secure_url" content="https://skpatch.skworld.io/og.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="skpatch: patch at AI speed, every image pinned and CVE-matched">
+  <meta property="og:locale" content="en_US">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@smilinTux">
+  <meta name="twitter:creator" content="@smilinTux">
+  <meta name="twitter:title" content="skpatch · Patch at AI Speed">
+  <meta name="twitter:description" content="Pinned images, continuous CVE matching, Renovate PRs, and a release gate that proves them: same day for critical, weekly for the rest.">
+  <meta name="twitter:image" content="https://skpatch.skworld.io/og.png">
+  <meta name="twitter:image:alt" content="skpatch: patch at AI speed, every image pinned and CVE-matched">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🩹</text></svg>">
+  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://skworld.io/#org",
+        "name": "smilinTux",
+        "url": "https://skworld.io",
+        "sameAs": ["https://github.com/smilinTux"]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://skpatch.skworld.io/#website",
+        "url": "https://skpatch.skworld.io/",
+        "name": "skpatch",
+        "description": "Patch at AI speed: pinned images, continuous CVE matching, and a release gate that proves every fix.",
+        "publisher": {"@id": "https://skworld.io/#org"}
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://skpatch.skworld.io/#app",
+        "name": "skpatch",
+        "description": "Every image pinned by digest, inventoried daily, SBOM'd into Dependency-Track, CVE-matched continuously. Renovate opens the pin-bump PRs, a release gate proves them: same day for critical, weekly for the rest, monthly review for the long tail.",
+        "url": "https://skpatch.skworld.io/",
+        "applicationCategory": "SecurityApplication",
+        "operatingSystem": "Linux",
+        "codeRepository": "https://github.com/smilinTux/skpatch",
+        "license": "https://opensource.org/licenses/MIT",
+        "isPartOf": {"@id": "https://skworld.io/#org"},
+        "publisher": {"@id": "https://skworld.io/#org"}
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root{--amber:#fbbf24;--green:#34d399;--ink:#efece4;--muted:rgba(239,236,228,.72);--panel:rgba(251,191,36,.06);--line:rgba(251,191,36,.30)}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,sans-serif;background:radial-gradient(ellipse at top,#1a1308 0%,#0d0a05 60%);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased}
+    .wrap{max-width:1000px;margin:0 auto;padding:0 1.4rem}
+    .mono{font-family:'JetBrains Mono',monospace}
+    .eyebrow{color:var(--amber);letter-spacing:.18em;font-size:.8rem;text-transform:uppercase}
+    a{color:var(--green);text-decoration:none}
+    a:hover{color:#fff}
+    nav{border-bottom:1px solid rgba(251,191,36,.15);padding:1rem 0;position:sticky;top:0;background:#0d0a05;z-index:10}
+    nav .wrap{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.6rem}
+    .nav-logo{font-family:'JetBrains Mono',monospace;font-weight:700;color:#fff;font-size:1rem;letter-spacing:.02em}
+    .nav-logo span{color:var(--amber)}
+    .nav-links{display:flex;gap:1.1rem;flex-wrap:wrap;font-size:.85rem}
+    .nav-links a{color:var(--muted)}
+    .nav-links a:hover{color:var(--amber)}
+    header{text-align:center;padding:4.5rem 0 3rem}
+    .icon{font-size:4rem;line-height:1}
+    h1{font-size:3.2rem;font-weight:800;letter-spacing:.03em;margin:.6rem 0 .2rem;background:linear-gradient(90deg,#fff,var(--amber));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+    .tag{font-size:1.3rem;color:var(--amber);font-weight:600;margin-top:.4rem}
+    .sub{color:var(--muted);font-size:1.1rem;max-width:680px;margin:1rem auto 0}
+    .badges{margin:1.8rem 0 0;display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
+    .badge{border:1px solid var(--line);border-radius:999px;padding:.5rem 1.05rem;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--amber);background:var(--panel);transition:all .25s}
+    .badge:hover{border-color:var(--amber);color:#fff}
+    section{padding:2.6rem 0;border-top:1px solid rgba(255,255,255,.06)}
+    h2{font-size:1.7rem;color:#fff;margin-bottom:1rem;font-weight:700}
+    h2 .n{color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:1.1rem;margin-right:.5rem}
+    h3.sub-h{color:var(--amber);font-size:1.15rem;margin:1.6rem 0 .6rem;font-weight:700}
+    p{color:var(--muted);margin-bottom:.9rem}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1rem;margin-top:1rem}
+    .card{border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:1.2rem;background:rgba(255,255,255,.02)}
+    .card h3{color:var(--amber);font-size:1.05rem;margin-bottom:.4rem}
+    .card p{font-size:.95rem;margin:0}
+    ol.arts{list-style:none;counter-reset:a;margin-top:.6rem}
+    ol.arts li{counter-increment:a;border-left:2px solid var(--line);padding:.2rem 0 1rem 1.2rem;position:relative}
+    ol.arts li::before{content:counter(a);position:absolute;left:-.85rem;top:0;background:var(--amber);color:#0d0a05;width:1.5rem;height:1.5rem;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.8rem}
+    ol.arts strong{color:#fff}
+    .flow{font-family:'JetBrains Mono',monospace;font-size:.85rem;color:var(--green);background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.2);border-radius:12px;padding:1rem 1.2rem;overflow-x:auto;white-space:pre;margin-top:.6rem}
+    table.spec{width:100%;border-collapse:collapse;margin-top:1rem;font-size:.92rem}
+    table.spec th,table.spec td{padding:.6rem .8rem;text-align:left;border-bottom:1px solid rgba(255,255,255,.08)}
+    table.spec th{color:var(--amber);font-family:'JetBrains Mono',monospace;font-size:.78rem;text-transform:uppercase;letter-spacing:.06em}
+    table.spec td{color:var(--muted)}
+    table.spec td strong{color:#fff}
+    .cta{display:flex;gap:.8rem;flex-wrap:wrap;margin-top:1rem}
+    .btn{border:1px solid var(--line);border-radius:10px;padding:.7rem 1.3rem;font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--amber);background:var(--panel);transition:all .25s}
+    .btn:hover{border-color:var(--amber);color:#fff}
+    .btn.bl{border-color:rgba(52,211,153,.35);color:var(--green)}
+    .btn.bl:hover{border-color:var(--green);color:#fff}
+    .callout{border:1px solid rgba(251,191,36,.45);background:linear-gradient(135deg,rgba(251,191,36,.1),rgba(52,211,153,.05));border-radius:16px;padding:1.6rem 1.8rem;margin-top:1.2rem}
+    .callout h3{color:#fff;font-size:1.15rem;margin-bottom:.6rem}
+    .callout h3 .tag-pill{display:inline-block;background:var(--amber);color:#0d0a05;font-family:'JetBrains Mono',monospace;font-size:.72rem;padding:.2rem .55rem;border-radius:999px;margin-right:.5rem;vertical-align:middle;letter-spacing:.04em}
+    .callout ul{margin:.6rem 0 0 1.1rem;color:var(--muted)}
+    .callout li{margin-bottom:.5rem}
+    .callout code{color:var(--green)}
+    .gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.1rem;margin-top:1rem}
+    .shot{border:1px solid rgba(255,255,255,.1);border-radius:12px;overflow:hidden;background:#07050a}
+    .shot img{width:100%;display:block}
+    .shot figcaption{padding:.65rem .85rem;font-size:.82rem;color:var(--muted);border-top:1px solid rgba(255,255,255,.07)}
+    .shot figcaption a{color:var(--amber)}
+    .pill{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;border-radius:999px;padding:.22rem .65rem;margin-left:.5rem;vertical-align:middle}
+    .pill.live{color:var(--amber);background:var(--panel);border:1px solid var(--line)}
+    .pill.weekly{color:var(--green);background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.3)}
+    footer{text-align:center;padding:3rem 0 2.5rem;color:rgba(255,255,255,.4);border-top:1px solid rgba(255,255,255,.06);margin-top:1rem}
+    footer .mono{font-size:.82rem}
+    .foot-links{display:flex;gap:1.4rem;flex-wrap:wrap;justify-content:center;margin:1.2rem 0;font-size:.85rem}
+    .foot-links a{color:var(--muted)}
+    .foot-links a:hover{color:var(--amber)}
+    @media(max-width:600px){h1{font-size:2.3rem}.icon{font-size:3rem}.nav-links{font-size:.76rem;gap:.7rem}}
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="wrap">
+      <a class="nav-logo" href="/">sk<span>patch</span></a>
+      <div class="nav-links">
+        <a href="#why">Why now</a>
+        <a href="#how">How it works</a>
+        <a href="#policy">Policy</a>
+        <a href="#components">Components</a>
+        <a href="#architecture">Architecture</a>
+        <a href="/docs.html">Docs</a>
+        <a href="https://github.com/smilinTux/skpatch" target="_blank" rel="noopener">Source</a>
+        <a href="https://skworld.io" target="_blank" rel="noopener">🐧 SKWorld</a>
+      </div>
+    </div>
+  </nav>
+
+  <header>
+    <div class="wrap">
+      <div class="icon">🩹</div>
+      <div class="mono eyebrow">skpatch · program</div>
+      <h1>skpatch</h1>
+      <div class="tag">Patch at AI speed.</div>
+      <p class="sub">Every image skpatch touches is pinned by digest, inventoried daily, SBOM'd into Dependency-Track, and CVE-matched continuously. Renovate opens the pin-bump pull requests, a release gate proves them before anything ships, and the lane you get depends only on what the finding actually is: same day for a critical with a fix in a reachable service, weekly batch for the rest, monthly review for the long tail.</p>
+      <div class="badges">
+        <a class="badge" href="#why">⚡ Why now</a>
+        <a class="badge" href="#policy">📋 Policy lanes</a>
+        <a class="badge" href="#architecture">🗺️ Architecture</a>
+        <a class="badge" href="https://github.com/smilinTux/skpatch" target="_blank" rel="noopener">💻 Code</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section id="what">
+      <h2>What skpatch is</h2>
+      <p>skpatch is the patching program for a sovereign fleet: hosts and images both, patched on a known cadence instead of by memory. It replaces a hand-rolled vulnerability register with a real SBOM and CVE-matching pipeline, and it replaces "someone noticed" with a scheduled job that runs whether or not anyone is watching.</p>
+      <div class="grid">
+        <div class="card"><h3>Pinned by digest</h3><p>No service runs a bare <code>:latest</code> tag. Every image is pinned to a SHA-256 digest, so "what's running" is a fact, not a guess.</p></div>
+        <div class="card"><h3>Daily inventory</h3><p>A read-only job walks every running service: image, tag, digest, and exposure class, public, SSO-gated, or internal, straight from the edge's own routing labels.</p></div>
+        <div class="card"><h3>skbom (Dependency-Track)</h3><p>Every distinct image digest gets a CycloneDX SBOM, uploaded once and re-matched against CVE feeds continuously, not just on ingest.</p></div>
+        <div class="card"><h3>Renovate, not a memory</h3><p>Renovate opens the pin-bump pull requests on its own schedule, plus an immediate security PR the moment a stored pin matches a known vulnerability.</p></div>
+        <div class="card"><h3>A release gate that proves it</h3><p>Nothing ships because a PR merged. Every change runs the same build-and-test harness before it is tagged and deployed.</p></div>
+        <div class="card"><h3>Hosts, through one dashboard</h3><p>The underlying host packages patch through an SSO-gated update dashboard, the same discipline applied one layer down the stack.</p></div>
+      </div>
+    </section>
+
+    <section id="why">
+      <h2><span class="n">§</span>Why now</h2>
+      <p>The honest version of the pitch is not that skpatch makes a fleet unhackable. It is that "we'll patch it when we notice" stopped being a survivable plan once disclosure-to-exploitation time collapsed from weeks to days.</p>
+      <div class="callout">
+        <h3><span class="tag-pill">real threat</span>Exploit chains weaponized in days, not months</h3>
+        <p>Automated scanners and agentic tooling can now go from a public CVE number to a working exploit chain, and from a working exploit chain to probing thousands of endpoints for it, inside the same week the advisory lands. They do not get tired, they do not take weekends, and they do not stop at the first failed attempt. A fleet that checks patch status by tag name instead of by what is actually running the binary finds out about a gap only when something goes wrong.</p>
+        <ul>
+          <li><strong>Base-OS CVEs dominate.</strong> A sample scan across a handful of live, well-known container images turned up thousands of findings between them, and most traced back to base-OS packages that only clear once the upstream image rebuilds, not to anything the operator misconfigured. Catching that requires scanning the running image, not the manifest.</li>
+          <li><strong>Exposure decides urgency, not just severity.</strong> A critical finding on an internal-only service and the same finding on a public one are not the same incident. skpatch's policy lanes read exposure class (public, SSO-gated, internal) alongside severity and fix availability, so the response speed matches the actual blast radius.</li>
+          <li><strong>Continuous beats periodic.</strong> A once-a-quarter scan is already stale the week after it runs. skpatch's SBOM store re-matches against CVE feeds on its own schedule, so a newly disclosed vulnerability against an image already on file surfaces without anyone re-running anything.</li>
+        </ul>
+      </div>
+      <p style="margin-top:1.2rem">What skpatch does not claim: it does not make a vulnerable service safe to leave unpatched, it does not replace a release gate with a scanner, and same day means same day, not same hour, the gate still takes real time to run. It closes the gap between "a fix exists" and "the fix is running," on a schedule that is actually kept.</p>
+    </section>
+
+    <section id="how">
+      <h2><span class="n">§</span>How it works: the pipeline</h2>
+      <p>Five stages, running on a fixed schedule, feeding one release gate.</p>
+      <div class="flow">1. Inventory (daily)
+   docker inspect over every running service, read-only
+   -> image, tag, digest, exposure class (public / sso-gated / internal)
+
+2. SBOM (daily)
+   Trivy CycloneDX scan, new digests only
+   -> uploaded to skbom (Dependency-Track) as one project per service
+
+3. Match (continuous)
+   skbom re-matches every stored SBOM against NVD, GHSA, and OSV
+   on its own schedule, not just on upload
+
+4. Respond
+   critical + fix available + public/sso-gated  -> same-day security PR
+   everything else with a fix                   -> weekly grouped PR (Renovate)
+   no fix yet                                    -> alert + tracked waiting-for
+   unactioned long tail                          -> monthly dashboard review
+
+5. Gate + deploy
+   every PR runs the same build + test harness
+   green -> tag the tested commit -> deploy, same day or on the weekly window</div>
+      <div class="grid" style="margin-top:1.4rem">
+        <div class="card"><h3>Renovate</h3><p>Grouped minor/patch/digest PRs on a weekly schedule, majors kept separate, plus an immediate security PR outside the schedule the moment a pin matches a known vulnerability.</p></div>
+        <div class="card"><h3>Alert fan-out</h3><p>Findings that cross the same-day threshold notify through chat and land as a tracked item, keyed by service and CVE, so nothing is only "seen once."</p></div>
+        <div class="card"><h3>One gate, every path</h3><p>A same-day critical, a weekly batch, and a long-tail cleanup all converge on the identical release gate. Nothing bypasses it except the documented same-day lane, and even that still runs it, just with the deploy allowed to lead on a tactical image-only update.</p></div>
+      </div>
+    </section>
+
+    <section id="policy">
+      <h2><span class="n">§</span>Policy: what decides the lane</h2>
+      <p>The lane a finding takes is a function of three things: severity, whether a fix exists, and how exposed the affected service is. Nothing is patched "because someone got to it."</p>
+      <table class="spec">
+        <tr><th>Finding</th><th>Lane</th></tr>
+        <tr><td><strong>Critical, fix available, service public or SSO-gated</strong></td><td>Same day: security PR, gate, deploy. A tactical image-only update is allowed with the gate trailing.</td></tr>
+        <tr><td><strong>Critical, no fix yet</strong></td><td>Alert immediately, tracked as a waiting-for item, re-checked daily until a fix lands or a mitigation is decided.</td></tr>
+        <tr><td><strong>High, fix available</strong></td><td>Weekly batch: grouped Monday PRs, gated deploy later in the week.</td></tr>
+        <tr><td><strong>Upstream rebuild, same tag, new digest</strong></td><td>Weekly batch, digest bumps grouped per service.</td></tr>
+        <tr><td><strong>Everything else</strong></td><td>Monthly review from the skbom dashboard.</td></tr>
+        <tr><td><strong>Host packages</strong></td><td>The same-day/weekly discipline, one layer down: the update dashboard plus unattended security upgrades on every node.</td></tr>
+      </table>
+      <p style="margin-top:1rem" class="mono" style="font-size:.85rem">Honest limit: the release gate takes real time to run end to end, so "same day" means same day, not same hour.</p>
+    </section>
+
+    <section id="components">
+      <h2><span class="n">§</span>Component map</h2>
+      <p>Six moving parts, one convergence point. The repo of record (<code>skgit</code>) is where Renovate opens PRs and where the release gate dispatches from; <code>skflow</code> schedules the recurring jobs; <code>skbom</code> is the SBOM store and CVE-matching engine; the release gate is the one place every change has to pass through; and host patching surfaces through an SSO-gated update dashboard, never a bare shell on a node.</p>
+      <div class="gallery">
+        <figure class="shot">
+          <img src="img/diagram-architecture.webp" alt="skpatch component map: skgit, Renovate, skflow, skbom, the release gate, the build host, the alert fan-out, the update dashboard, and deploy targets, with trust boundaries drawn around the fleet cluster, the SSO-gated zone, and the build worker" loading="lazy">
+          <figcaption><span class="pill live">Interactive</span> Component map with trust boundaries. <a href="diagrams/skpatch.architecture.html" target="_blank" rel="noopener">Open the interactive version ↗</a></figcaption>
+        </figure>
+      </div>
+      <table class="spec" style="margin-top:1.5rem">
+        <tr><th>Component</th><th>Role</th></tr>
+        <tr><td><strong>skgit</strong></td><td>Repo of record for the framework and every instance. Renovate and the release gate both point here.</td></tr>
+        <tr><td><strong>skflow</strong></td><td>Workflow engine (Windmill) running the inventory, SBOM, Renovate, and alert flows on a fixed schedule.</td></tr>
+        <tr><td><strong>skbom</strong></td><td>Dependency-Track plus the daily SBOM job: the register that replaced a hand-kept vulnerability list.</td></tr>
+        <tr><td><strong>Release gate</strong></td><td>The build and test harness every change proves itself against, on a dedicated worker host with a documented failover.</td></tr>
+        <tr><td><strong>Update dashboard</strong></td><td>SSO-gated surface for host-level patching, the same cadence discipline one layer down from containers.</td></tr>
+        <tr><td><strong>Deploy targets</strong></td><td>The fleet nodes themselves: always a pinned-digest update, never a floating tag, same-day or on the weekly window.</td></tr>
+      </table>
+    </section>
+
+    <section id="architecture">
+      <h2><span class="n">§</span>Architecture: three ways to read the pipeline</h2>
+      <p>Each diagram is a standalone, self-contained HTML page: explorable, with motion, and a dark/light toggle. They open in a new tab.</p>
+      <div class="gallery">
+        <figure class="shot">
+          <img src="img/diagram-dataflow.webp" alt="skpatch data flow: inventory, SBOM, Dependency-Track, alert fan-out and Renovate, release gate, deploy, with sensitivity labels on the critical and public-feed paths" loading="lazy">
+          <figcaption><span class="pill live">Interactive</span> Data flow, sensitivity labelled. <a href="diagrams/skpatch.dataflow.html" target="_blank" rel="noopener">Open ↗</a></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="img/diagram-workflow.webp" alt="skpatch release workflow: the same-day critical lane and the weekly batch lane, both converging on the release gate before deploy" loading="lazy">
+          <figcaption><span class="pill weekly">Interactive</span> Release lanes: same-day and weekly. <a href="diagrams/skpatch.workflow.html" target="_blank" rel="noopener">Open ↗</a></figcaption>
+        </figure>
+        <figure class="shot">
+          <img src="img/diagram-architecture.webp" alt="skpatch component map with trust boundaries" loading="lazy">
+          <figcaption><span class="pill live">Interactive</span> Component map (see Components above). <a href="diagrams/skpatch.architecture.html" target="_blank" rel="noopener">Open ↗</a></figcaption>
+        </figure>
+      </div>
+
+      <p style="margin-top:1.4rem">A plain Markdown version of the component map, which renders directly on GitHub without opening a new tab, lives in the <a href="https://github.com/smilinTux/skpatch-skworld-io#component-map" target="_blank" rel="noopener">repository README</a>.</p>
+    </section>
+
+    <section id="ops">
+      <h2>Release process</h2>
+      <p>skpatch ships through the same release discipline as the rest of the framework: every change, whether a Renovate PR, a same-day security PR, or a manual bump, runs the full build-and-test harness before it is tagged and deployed. The glitch rule (the same stage passes on rerun, with no code change) and status reporting stay exactly as they are for every other change.</p>
+      <div class="cta">
+        <a class="btn" href="https://github.com/smilinTux/skpatch" target="_blank" rel="noopener">skpatch on GitHub</a>
+        <a class="btn bl" href="/docs.html">Read the docs</a>
+        <a class="btn bl" href="https://github.com/smilinTux/skstacks" target="_blank" rel="noopener">Explore SKStacks</a>
+      </div>
+    </section>
+
+    <section id="family">
+      <h2>Part of the ecosystem</h2>
+      <p>skpatch keeps every image and host on the fleet current, on a schedule it actually keeps. <a href="https://sksec.skworld.io" target="_blank" rel="noopener">sksec</a> guards the edge every one of those services sits behind, and <a href="https://skhub.skworld.io" target="_blank" rel="noopener">skhub</a> is one of the services it patches. All part of <a href="https://skworld.io" target="_blank" rel="noopener">SKWorld</a>, the sovereign AI ecosystem where you own the whole stack, from silicon to soul.</p>
+      <div class="cta">
+        <a class="btn bl" href="https://skworld.io" target="_blank" rel="noopener">🐧 Explore SKWorld</a>
+        <a class="btn bl" href="https://sksec.skworld.io" target="_blank" rel="noopener">🛡️ Meet sksec</a>
+        <a class="btn bl" href="https://skhub.skworld.io" target="_blank" rel="noopener">🗂️ Meet skhub</a>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div class="wrap">
+      <div class="tag" style="font-size:1.05rem">Patch at AI speed.</div>
+      <div class="foot-links">
+        <a href="https://skworld.io" target="_blank" rel="noopener">SKWorld</a>
+        <a href="https://skstacks.skworld.io" target="_blank" rel="noopener">SKStacks</a>
+        <a href="https://sksec.skworld.io" target="_blank" rel="noopener">sksec</a>
+        <a href="https://skhub.skworld.io" target="_blank" rel="noopener">skhub</a>
+        <a href="https://skgateway.skworld.io" target="_blank" rel="noopener">skgateway</a>
+        <a href="/docs.html">Docs</a>
+      </div>
+      <p class="mono" style="margin-top:.6rem">part of the SKWorld sovereign AI ecosystem 🐧 · built by <a href="https://github.com/smilinTux" target="_blank" rel="noopener">smilinTux</a> · <a href="https://github.com/smilinTux/skpatch-skworld-io/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a></p>
+    </div>
+  </footer>
+</body>
+</html>
