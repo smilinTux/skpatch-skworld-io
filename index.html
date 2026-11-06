@@ -253,7 +253,7 @@
       <p>Six moving parts, one convergence point. The repo of record (<code>skgit</code>) is where Renovate opens PRs and where the release gate dispatches from; <code>skflow</code> schedules the recurring jobs; <code>skbom</code> is the SBOM store and CVE-matching engine; the release gate is the one place every change has to pass through; and host patching surfaces through an SSO-gated update dashboard, never a bare shell on a node.</p>
       <div class="gallery">
         <figure class="shot">
-          <img src="img/diagram-architecture.webp" alt="skpatch component map: skgit, Renovate, skflow, skbom, the release gate, the build host, the alert fan-out, the update dashboard, and deploy targets, with trust boundaries drawn around the fleet cluster, the SSO-gated zone, and the build worker" loading="lazy">
+          <img src="img/diagram-architecture.png" alt="skpatch component map: skgit, Renovate, skflow, skbom, the release gate, the build host, the alert fan-out, the update dashboard, and deploy targets, with trust boundaries drawn around the fleet cluster, the SSO-gated zone, and the build worker" loading="lazy">
           <figcaption><span class="pill live">Interactive</span> Component map with trust boundaries. <a href="diagrams/skpatch.architecture.html" target="_blank" rel="noopener">Open the interactive version ↗</a></figcaption>
         </figure>
       </div>
@@ -273,15 +273,15 @@
       <p>Each diagram is a standalone, self-contained HTML page: explorable, with motion, and a dark/light toggle. They open in a new tab.</p>
       <div class="gallery">
         <figure class="shot">
-          <img src="img/diagram-dataflow.webp" alt="skpatch data flow: inventory, SBOM, Dependency-Track, alert fan-out and Renovate, release gate, deploy, with sensitivity labels on the critical and public-feed paths" loading="lazy">
+          <img src="img/diagram-dataflow.png" alt="skpatch data flow: inventory, SBOM, Dependency-Track, alert fan-out and Renovate, release gate, deploy, with sensitivity labels on the critical and public-feed paths" loading="lazy">
           <figcaption><span class="pill live">Interactive</span> Data flow, sensitivity labelled. <a href="diagrams/skpatch.dataflow.html" target="_blank" rel="noopener">Open ↗</a></figcaption>
         </figure>
         <figure class="shot">
-          <img src="img/diagram-workflow.webp" alt="skpatch release workflow: the same-day critical lane and the weekly batch lane, both converging on the release gate before deploy" loading="lazy">
+          <img src="img/diagram-workflow.png" alt="skpatch release workflow: the same-day critical lane and the weekly batch lane, both converging on the release gate before deploy" loading="lazy">
           <figcaption><span class="pill weekly">Interactive</span> Release lanes: same-day and weekly. <a href="diagrams/skpatch.workflow.html" target="_blank" rel="noopener">Open ↗</a></figcaption>
         </figure>
         <figure class="shot">
-          <img src="img/diagram-architecture.webp" alt="skpatch component map with trust boundaries" loading="lazy">
+          <img src="img/diagram-architecture.png" alt="skpatch component map with trust boundaries" loading="lazy">
           <figcaption><span class="pill live">Interactive</span> Component map (see Components above). <a href="diagrams/skpatch.architecture.html" target="_blank" rel="noopener">Open ↗</a></figcaption>
         </figure>
       </div>
